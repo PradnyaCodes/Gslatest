@@ -1,0 +1,114 @@
+Job Role:
+I had been working for a fintech client which is a universal bank and their business includes customer banking and a top tier, global corporate and investment bank.
+I was a part of a wealth management team where high-level working was data processing. We used to get lot of trades and balance data from the upstream. We must process the data and provide it to internal consumers. These consumers consume this data for their business. consumers could be some banking software solutions or portfolio managing platforms or regulatories. For ex: settling trade positions, for disclosure purposes, for FATCA regulatory. ex: all trade positions get settled up from data processing and for next business date the client could see the settled values from the trades.
+My responsibility was to create new services/update services basically rest api's to bring data from different sources using API and load them into landing table and create new API’s for the consumer to consume processed data.
+
+
+Client/Company
+fintech client which is a universal bank and their business includes customer banking and a top tier, global corporate and investment bank.
+
+
+Stakeholders
+Avaloq, Charles River, One reg - 
+
+Avaloq-Avaloq is a banking software and services company that offers a comprehensive product suite for financial institutions.
+
+Charles river: Investment management functions (A browser-based solution that allows users to manage portfolios, compliance, and trades from anywhere. Helps with investment decision support, compliance management, and risk reduction. It includes an Investment Book of Record (IBOR) that provides real-time cash and position data. ) Charles River IMS helps automate and simplify the investment process across asset classes, from portfolio management and risk analytics through trading and post-trade settlement, with integrated compliance and managed data throughout.
+
+
+
+Contributions
+1. Created a Java service to update instrument details in a repository.
+Instruments- Ex: bonds, stocks, metals, mortgage. customer uses client's platform for managing instruments. Service basically provides instrument info used for regulatories.
+
+Requirement/problem statement:
+We have a instrument repository for storing instrument details. Any changes in a particular instrument should be reflected in a database too. For ex: 
+a particular instrument is now acquired by a different entity and there's changes in issuer country code from GBR to JPN so this changes should be aligned in our database.
+How it is solved?
+
+Solution implemented: 
+We have a upstream team called as pride team which is a data source of instrument details for different teams. In an event of any changes in instrument details, it pushes such events to a queue.
+Based on the event type a process is delegated. event type can be like price update eod, onboarded for training, instrument update. 
+So, we filter a message for a instrument update with the event type. I created a delegated service for instrument update in which we have imported an upstream library and used it's function to convert xml object to a pride instrument java object where pride instrument is a model class having attributes like instrument id, Mifi id, name, type, currency, issue date, maturity date, issuer, country code, status. Then we update these changes in database.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+2. Insertion of multiple trade objects to a database though proper xml parsing.
+
+Requirement/problem statement:
+We receive an xml file which contains basket constituent. There can be one basket constituents or a list of basket constituents which should be parsed and used for creating multiple trade objects and inserting them into a database. For creating each trade object an ISIN value(attribute in xml file) was referred.
+
+Basket constituents- Represents an individual asset within a basket, including properties for tracking its type, weight, and value.
+ISIN, constituent id, name, type, weight, quantity, pricePerUnit, exchange etc.
+
+Trade- The Trade class represents a transaction involving one or more constituents or baskets. ISIN, trade id, type,quantity, trade price, trade date, status, decreaseInUnits, List of basket constituents etc.
+
+After this java service have been developed we was able to insert multiple trade objects in a table but a bug was found. Bug - if a xml file contains a list of n no. of basket constituents with no ISIN value, then at such case no. of records created in table found less than what it is expected.
+Reason: ISIN value can be blank in an xml list for any of the basket constituent.
+We need to Ensure a list of basket constituents gets parsed properly and all trade objects gets created, mapped and inserted to a database correctly.
+
+
+Solution implemented:
+Implemented xml unmarsheller. It will map each basket constituent of a list into each trade object irrespective of null ISIN. So , even if we receive no isin value
+in a basket const object(through an axm) a new trade object will be created.
+Parse method used in a service has been overrided.
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+3. Analyzed, designed, and delivered enhancements to existing REST APIs, integrating a Secret Management Tool and JDBC AD Authentication.
+
+Requirement/problem statement:
+ Due to new compliance any password and related sensitive stuff should not be stored in a file. currently any service fetch password from an encrypted file and acquire connection to a database. Thus, there is a need to develop such a tool and integrate with our services.
+
+Solution implemented:
+A central secret management(csm) tool was developed by a client. We need to integrate that tool in our existing services to make secure connection to database.
+Import CSM libraries and added new properties in a application properties file like vault.role, vault.secretpath. Updated methods to return password from a csm tool based on these properties and acquire connection to a database.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+4. Development of an interactive dashboard for real-time batch process monitoring, leveraging Spring Boot (J2EE backend) and React(frontend), achieving a 91.33% latency reduction by optimizing backend calls.
+
+Requirement/problem statement:
+Clients requires a platform where they can monitor status of different autosys jobs.
+
+Solution implemented: Developed a dashboard for real time monitoring of autosys batch jobs. These Batch jobs contains attributes like job id, start date & time, end date & time, duration, status etc.
+A dedicated java service has been created to fetch data from a table( this batch status table is provided by a etl team) and passes it to a dashboard. Mostly worked on backened part of this task. 
+Later on some users also complaint for latency.
+we Improved latency by implementing extra fields and using updated stored procedure. Fields like days/duration(for ex: 30 days, 60 days) has been imported in a service so that we can filter out the data through a duration which clients wants to see in a dashboard. This decreased latency as earlier 5-6 years of data was flowing to a dashboard which is not required.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+5. Led the remediation of 10+ Veracode vulnerabilities in REST API services, implementing secure coding practices that ensured a 100% scan score; this initiative fortified system integrity and reduced future security risks
+
+Veracode is a cloud-based application security testing platform that helps identify vulnerabilities in code through static analysis, dynamic analysis, and software composition analysis (SCA).
+
+Flaws like: 1. SQL Injection vulnerabilities
+public User getUser(String username) {
+    String query = "SELECT * FROM users WHERE username = '" + username + "'";
+    // Execute query (may lead to SQL Injection)
+}
+Fix: Use prepared statements to separate the SQL code from user input.
+public User getUser(String username) {
+    String query = "SELECT * FROM users WHERE username = ?";
+    PreparedStatement statement = connection.prepareStatement(query);
+    statement.setString(1, username);
+    // Execute query securely
+}
+
+2. Cross-Site Scripting (XSS)
+Cross-Site Scripting vulnerabilities happen when an application displays unsanitized user input in a way that executes malicious JavaScript in the context of the user’s browser.
+
+3. Hardcoded Credentials
+Hardcoding sensitive information, like credentials, directly in source code exposes them if the code is compromised.
+public void connectToDatabase() {
+    String username = "admin";
+    String password = "password123";  // Hardcoded password
+    // Database connection code
+}
+
+Fix: Use secure storage, such as environment variables or a secrets management tool.
+
+public void connectToDatabase() {
+    String username = System.getenv("DB_USERNAME");
+    String password = System.getenv("DB_PASSWORD");
+    // Secure database connection
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
