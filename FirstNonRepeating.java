@@ -17,7 +17,7 @@ public class FirstNonRepeating {
     }
 
     public static void main(String[] args) {
-        String s = "abbaccdd";
+        String s = "abbacd"; // ans should be c
         System.out.println(findfirstNonRepeatingCharacter(s));
     }
 }
