@@ -15,38 +15,42 @@ import java.util.*;
 public class RepresentFraction {
 
     public static String result(int num, int den){
-        int q = num/den;
-        int r = num%den;
-        StringBuilder sb = new StringBuilder();
-        sb.append(q);
-        if(r==0){
 
-            return sb.toString();
-        }
 
-        else{
+        public static String Solution(int num, int den){
+            StringBuilder ans = new StringBuilder();
+
+            if(num<0 || den<0){
+                ans.append('-');
+            }
+            num = Math.abs(num);
+            den = Math.abs(den);
+            int q = num/den;
+            int r = num%den;
+            ans.append(q);
+            if(r==0){
+                return ans.toString();
+            }
+            ans.append('.');
             Map<Integer,Integer> map = new HashMap<>();
-            sb.append(".");
-            while (r != 0) {
-                if (map.containsKey(r)) {
-                    int len = map.get(r);
-                    sb.insert(len, "(");
-                    sb.append(")");
+            while(r!=0){
+                if(map.containsKey(r)){
+                    ans.insert(map.get(r), "(");
+                    ans.append(")");
                     break;
-                } else {
-                    map.put(r, sb.length());
-                    r *= 10;
-                    q = r / den;
-                    r = r % den;
-                    sb.append(q);
                 }
+                map.put(r,ans.length());
+                r = r*10;
+                q = r/den;
+                r = r%den;
+                ans.append(q);
 
             }
-        }
-        return sb.toString();
+
+            return ans.toString();
     }
     public static void main(String[] args) {
-        int numerator = 193, denominator = 7;
+        int numerator = -193, denominator = 7;
         System.out.println(result(numerator,denominator));
     }
 }
