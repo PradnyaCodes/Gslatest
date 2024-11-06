@@ -1,47 +1,39 @@
 import java.util.Scanner;
 
 public class SumOfFractions {
+    public static String sumOfFractions(int n1, int d1, int n2, int d2){
+        int sum=0;
+        int d;
+        if(d1==d2){
+            sum = n1+n2;
+            d = d1;
+            int div=sum/d;
+            sum=sum/div;
+            d = d/div;
+            return sum+"/"+d;
+        }
+        d = d1*d2;
+        d1 = d/d1;
+        d2 = d/d2;
+        n1 = n1*d1;
+        n2 = n2*d2;
+        sum = n1+n2;
+        int res = Math.min(sum,d);
+        int div=1;
+        for(int i=2;i<res;i++){
+            if(sum%i==0 && d%i==0){
+                div=i;
+            }
+        }
+        sum=sum/div;
+        d=d/div;
+        return sum+"/"+d;
+
+    }
 
     public static void main(String[] args) {
-        Scanner s = new Scanner(System.in);
-        int num1 = s.nextInt();
-        int den1 = s.nextInt();
-        int num2 = s.nextInt();
-        int den2 = s.nextInt();
-        int sum, d,min;
-
-        if(den1==den2){
-            sum = num1+num2;
-            d=den1;
-            System.out.println(sum+"/"+d);
-        }
-        else {
-            d=den1*den2;
-            den1=d/den1;
-            den2=d/den2;
-            num1 = num1*den1;
-            num2 = num2* den2;
-            sum = num1+num2;
-            System.out.println(sum);
-            min = Math.min(sum,d);
-            System.out.println(d);
-            int div=1;
-            for(int i=2;i<=min;i++){
-                if(sum%i==0 && d%i==0){
-                   div=i;
-                }
-            }
-            sum = sum/div;
-            d = d/div;
-
-            if(sum%d==0){
-                sum = sum/d;
-                System.out.println(sum);
-            }
-            else {
-                System.out.println(sum+"/"+d);
-            }
-        }
-
+        int n1 = 1; int d1=2;
+        int n2 = 3; int d2 = 2;
+        System.out.println(sumOfFractions(n1,d1,n2,d2));
     }
 }
