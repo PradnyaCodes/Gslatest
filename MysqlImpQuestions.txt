@@ -1,0 +1,46 @@
+
+employees                             projects
++---------------+---------+           +---------------+---------+
+| id            | int     |<----+  +->| id            | int     |
+| first_name    | varchar |     |  |  | title         | varchar |
+| last_name     | varchar |     |  |  | start_date    | date    |
+| salary        | int     |     |  |  | end_date      | date    |
+| department_id | int     |--+  |  |  | budget        | int     |
++---------------+---------+  |  |  |  +---------------+---------+
+                             |  |  |
+departments                  |  |  |  employees_projects
++---------------+---------+  |  |  |  +---------------+---------+
+| id            | int     |<-+  |  +--| project_id    | int     |
+| name          | varchar |     +-----| employee_id   | int     |
++---------------+---------+           +---------------+---------+
+
+1. SHOW DUPLICATE ROWS IN EMPLOYEE_PROJECT TABLE
+
+SELECT e1.project_id, e1.employee_id from employees_projects e1 GROUP BY e1.employee_id, e1.project_id having COUNT(*)>1;
+
+2. DELETE DUPLICATE ROWS IN EMPLOYEE_PROJECT TABLE
+CREATE TEMPORARY TABLE tmp_table AS
+SELECT employee_id, project_id
+FROM employees_projects
+GROUP BY employee_id, project_id;
+ 
+-- Delete all rows in the original table
+DELETE FROM employees_projects;
+ 
+-- Insert the unique rows back into the original table
+INSERT INTO employees_projects (employee_id, project_id)
+SELECT employee_id, project_id FROM tmp_table;
+ 
+-- drop the temporary table
+DROP TEMPORARY TABLE tmp_table;
+select * from employees_projects
+
+
+3.delete duplicate orders in a orders table. order_id is primary key. rows which have same cust_id and order_date are considered duplicates
+
+DELETE FROM orders
+WHERE order_id NOT IN (
+    SELECT MIN(order_id)
+    FROM orders
+    GROUP BY cust_id, order_date
+);
